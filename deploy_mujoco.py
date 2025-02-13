@@ -29,17 +29,18 @@ def pd_control(target_q, q, kp, target_dq, dq, kd):
 if __name__ == "__main__":
     # get config file name from command line
     import argparse
-
+    
     parser = argparse.ArgumentParser()
     parser.add_argument("config_file", type=str, help="config file name in the config folder")
     args = parser.parse_args()
     config_file = args.config_file
+    working_dir = os.path.dirname(os.path.abspath(__file__))
     data_root_dir = "data"
     
     with open(config_file, "r") as f:
         config = yaml.load(f, Loader=yaml.FullLoader)
-        policy_path = config["policy_path"]
-        xml_path = config["xml_path"]
+        policy_path = config["policy_path"].replace("{WORKING_DIR}", working_dir)
+        xml_path = config["xml_path"].replace("{WORKING_DIR}", working_dir)
         
         log_on = config["log_on"]
 

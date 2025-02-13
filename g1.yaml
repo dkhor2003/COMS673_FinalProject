@@ -1,5 +1,5 @@
-policy_path: "policy/policy_lstm_1_500.pt"
-xml_path: "g1_model/scene.xml"
+policy_path: "{WORKING_DIR}/policy/policy_lstm_1_500.pt"
+xml_path: "{WORKING_DIR}/model/scene.xml"
 
 log_on: false  # boolean for allowing trajectory collecting or not
 
