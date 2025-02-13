@@ -10,6 +10,11 @@
 
 ## 📦 Installation and Configuration
 
+Clone the repository:
+```bash
+git clone https://github.com/dkhor2003/COMS673_FinalProject.git
+```
+
 Create a virtual environment:
 ```bash
 conda create -n COMS673 python=3.8
