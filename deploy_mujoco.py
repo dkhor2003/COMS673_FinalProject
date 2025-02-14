@@ -91,7 +91,7 @@ if __name__ == "__main__":
         joint_names = []
         dofs_q = []
         dofs_dq = []
-        dofs_torque = []
+        dofs_ddq = []
         
         for i in range(m.njnt):
             joint_names.append(mujoco.mj_id2name(m, mujoco.mjtObj.mjOBJ_JOINT, i))
@@ -99,23 +99,34 @@ if __name__ == "__main__":
         root_body = joint_names[0]
         dofs = joint_names[1:]
         
-        root_body_q = [f"{root_body}_qw",
+        root_body_q = [f"{root_body}_x",
+                       f"{root_body}_y",
+                       f"{root_body}_z",
+                       f"{root_body}_qw",
                        f"{root_body}_qx",
                        f"{root_body}_qy",
                        f"{root_body}_qz"]
 
-        root_body_dq = [f"{root_body}_wx",
+        root_body_dq = [f"{root_body}_vx",
+                        f"{root_body}_vy",
+                        f"{root_body}_vz",
+                        f"{root_body}_wx",
                         f"{root_body}_wy",
                         f"{root_body}_wz"]
+        
+        root_body_ddq = [f"{root_body}_acc_x",
+                         f"{root_body}_acc_y",
+                         f"{root_body}_acc_z",
+                         f"{root_body}_alpha_x",
+                         f"{root_body}_alpha_y",
+                         f"{root_body}_alpha_z"]
         
         for dof in dofs:
             dofs_q.append(f"{dof}_q")
             dofs_dq.append(f"{dof}_dq")
-            dofs_torque.append(f"{dof}_torque")
+            dofs_ddq.append(f"{dof}_ddq")
         
-        robot_command = ["vx_command", "vy_command", "yaw_command"]
-        
-        header = root_body_q + dofs_q + root_body_dq + dofs_dq + dofs_torque + robot_command
+        header = root_body_q + dofs_q + root_body_dq + dofs_dq + root_body_ddq + dofs_ddq + "fallover"
         traj_logger.writerow(header)  
 
     # load policy
