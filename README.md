@@ -3,7 +3,7 @@
 </div>
 
 <p align="center">
-  <strong>This is a repository for our COMS 673 Final Project. Our objective here is to design and develop a deep learning model i.e., a Neural Network that can predict whether a humanoid robot will fall down based on kinematic information obtained through sensors from the lower body joints.</strong> 
+  <strong>This is a repository for our COMS 673 Final Project. Our objective here is to design and develop a Deep Learning model that can predict whether a humanoid robot will fall down based on kinematic information obtained through sensors from the lower body joints.</strong> 
 </p>
 
 ---
