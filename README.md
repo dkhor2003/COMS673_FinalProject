@@ -46,3 +46,5 @@ The available policies are located under the `policy` directory.
 - Update the `policy_path` in the YAML configuration file to switch to a different locomotion policy available under the `policy` directory.
 - Update the `cmd_init` [vx, vy, yaw] in the YAML configuration file to change the desired starting motion. 
 
+If `log_on` is `true`, running the above line will generate joint state trajectories as a csv file under the `data` folder.
+
