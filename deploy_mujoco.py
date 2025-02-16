@@ -21,6 +21,24 @@ def get_gravity_orientation(quaternion):
 
     return gravity_orientation
 
+def get_euler_xyz(q):
+    qx, qy, qz, qw = 0, 1, 2, 3
+
+    # roll (x-axis rotation)
+    sinr_cosp = 2.0 * (q[qw] * q[qx] + q[qy] * q[qz])
+    cosr_cosp = q[qw] * q[qw] - q[qx] * q[qx] - q[qy] * q[qy] + q[qz] * q[qz]
+    roll = np.arctan2(sinr_cosp, cosr_cosp)
+
+    # pitch (y-axis rotation)
+    sinp = 2.0 * (q[qw] * q[qy] - q[qz] * q[qx])
+    pitch = np.where(np.abs(sinp) >= 1, np.copysign(np.pi / 2.0, sinp), np.arcsin(sinp))
+
+    # yaw (z-axis rotation)
+    siny_cosp = 2.0 * (q[qw] * q[qz] + q[qx] * q[qy])
+    cosy_cosp = q[qw] * q[qw] + q[qx] * q[qx] - q[qy] * q[qy] - q[qz] * q[qz]
+    yaw = np.arctan2(siny_cosp, cosy_cosp)
+
+    return np.stack((roll, pitch, yaw))
 
 def pd_control(target_q, q, kp, target_dq, dq, kd):
     """ Calculates torques from position commands """
@@ -126,7 +144,7 @@ if __name__ == "__main__":
             dofs_dq.append(f"{dof}_dq")
             dofs_ddq.append(f"{dof}_ddq")
         
-        header = root_body_q + dofs_q + root_body_dq + dofs_dq + root_body_ddq + dofs_ddq + "fallover"
+        header = root_body_q + dofs_q + root_body_dq + dofs_dq + root_body_ddq + dofs_ddq + ["fallover"]
         traj_logger.writerow(header)  
 
     # load policy
@@ -149,9 +167,14 @@ if __name__ == "__main__":
             counter += 1
             if counter % control_decimation == 0:
                 
-                # Log joint states (excluding base xyz pos and linear xyz velocity)
+                # Log joint states as well as fallover indicator
                 if log_on:
-                    traj_logger.writerow(np.concatenate((d.qpos[3:], d.qvel[3:], tau, cmd)))
+                    rpy = get_euler_xyz(d.qpos[3:7])
+                    if abs(rpy[1]) > 1.0 or abs(abs(rpy[0])-np.pi) > 0.8 or d.qpos[2] < 0.58:
+                        fallover = 1
+                    else:
+                        fallover = 0
+                    traj_logger.writerow(np.concatenate((d.qpos, d.qvel, d.qacc, [fallover])))
                 
                 # Apply control signal here.
 
