@@ -34,7 +34,7 @@ conda install pyyaml
 
 ## Simulation in MuJoCo
 
-Simulate G1 in the Mujoco simulator:
+Simulate G1 in the MuJoCo simulator:
 
 ```bash
 python deploy_mujoco.py g1.yaml
