@@ -3,6 +3,7 @@ import mujoco.viewer
 import mujoco
 import numpy as np
 import torch
+import random
 import yaml
 import os
 import csv
@@ -55,12 +56,25 @@ if __name__ == "__main__":
     working_dir = os.path.dirname(os.path.abspath(__file__))
     data_root_dir = "data"
     
+    vx_range = [-1.2, 1.2]
+    vy_range = [-1.2, 1.2]
+    yaw_range = [-1., 1.]
+    force_ranges = [-50, -30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 30, 50]
+    
+    x_force = random.choice(force_ranges)
+    y_force = random.choice(force_ranges)
+    vx = random.uniform(vx_range[0], vx_range[1])
+    vy = random.uniform(vy_range[0], vy_range[1])
+    yaw = random.uniform(yaw_range[0], yaw_range[1])
+    
     with open(config_file, "r") as f:
         config = yaml.load(f, Loader=yaml.FullLoader)
         policy_path = config["policy_path"].replace("{WORKING_DIR}", working_dir)
+        policy_path = policy_path.replace("{POLICY}", config["policy"])
         xml_path = config["xml_path"].replace("{WORKING_DIR}", working_dir)
         
         log_on = config["log_on"]
+        render = config["render"]
 
         simulation_duration = config["simulation_duration"]
         simulation_dt = config["simulation_dt"]
@@ -81,6 +95,7 @@ if __name__ == "__main__":
         num_obs = config["num_obs"]
         
         cmd = np.array(config["cmd_init"], dtype=np.float32)
+        cmd = np.array([vx, vy, yaw])
 
     # define context variables
     action = np.zeros(num_actions, dtype=np.float32)
@@ -162,6 +177,8 @@ if __name__ == "__main__":
             
             # mj_step can be replaced with code that also evaluates
             # a policy and applies a control signal before stepping the physics.
+            d.qfrc_applied[0] = x_force
+            d.qfrc_applied[1] = y_force
             mujoco.mj_step(m, d)
         
             counter += 1
@@ -170,7 +187,7 @@ if __name__ == "__main__":
                 # Log joint states as well as fallover indicator
                 if log_on:
                     rpy = get_euler_xyz(d.qpos[3:7])
-                    if abs(rpy[1]) > 1.0 or abs(abs(rpy[0])-np.pi) > 0.8 or d.qpos[2] < 0.58:
+                    if d.qpos[2] < 0.58: # abs(rpy[1]) > 1.0 or abs(abs(rpy[0])-np.pi) > 0.8
                         fallover = 1
                     else:
                         fallover = 0
