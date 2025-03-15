@@ -54,7 +54,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     config_file = args.config_file
     working_dir = os.path.dirname(os.path.abspath(__file__))
-    data_root_dir = "data"
+    data_root_dir = "data/g1_traj"
     
     vx_range = [-1.2, 1.2]
     vy_range = [-1.2, 1.2]
