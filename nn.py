@@ -1,25 +1,26 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
-import pandas as pd
-import numpy as np
-from torch.utils.data import Dataset, DataLoader
 
-# Define the LSTM Model
 class FalloverPredictor(nn.Module):
-    def __init__(self, input_size, hidden_size, num_layers, output_size):
+    def __init__(self, input_size, hidden_size=64, num_layers=2, dropout=0.2):
         super(FalloverPredictor, self).__init__()
-        self.hidden_size = hidden_size
-        self.num_layers = num_layers
-        self.lstm = nn.LSTM(input_size, hidden_size, num_layers, batch_first=True)
-        self.fc = nn.Linear(hidden_size, output_size)
+        self.lstm = nn.LSTM(input_size, hidden_size, num_layers, batch_first=True, dropout=dropout)
+        self.fc = nn.Linear(hidden_size, 1)
         self.sigmoid = nn.Sigmoid()
 
     def forward(self, x):
-        h0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size).to(x.device)
-        c0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size).to(x.device)
+        lstm_out, _ = self.lstm(x)
+        last_out = lstm_out[:, -1, :]
+        out = self.fc(last_out)
+        return self.sigmoid(out).squeeze(-1)
 
-        out, _ = self.lstm(x, (h0, c0))
-        out = self.fc(out[:, -1, :])  # Take the last output in the sequence
-        out = self.sigmoid(out)
-        return 1 if out > 0.5 else 0 # Binary classifier (0 for non-fall and 1 for fall)
+# Example usage
+num_features = 18  # Adjust according to your data
+window_size = 50   # Adjust according to your data
+model = FalloverPredictor(input_size=num_features)
+
+# Dummy input (batch_size, window_size, num_features)
+dummy_input = torch.randn(32, window_size, num_features)
+out = model(dummy_input)
+print(out.shape)  # Should be (32,)

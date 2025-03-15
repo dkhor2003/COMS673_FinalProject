@@ -57,3 +57,4 @@ def process_csv_into_dataset(data_dir):
     # Xs shape: (total_num_of_data, window_size, num_features)
     # ys shape: (total_num_of_data, )
     return Xs, ys 
+
