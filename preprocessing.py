@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import numpy as np
 import torch
 
 def extract_features(dataset):
@@ -30,3 +31,15 @@ def create_dataset(features, targets, window_size, time_into_future=0.5, log_dt=
         X.append(feature)
         y.append(target)
     return torch.tensor(X), torch.tensor(y)
+
+def process_csv(data_dir):
+    data = None
+    for csv_file in os.listdir(data_dir):
+        traj = pd.read_csv(f"{data_dir}/{csv_file}").to_numpy()
+        if data is not None:
+            data = np.vstack((data, traj))
+        else:
+            data = traj
+    print(data.shape)
+    
+process_csv("data/g1_traj")
