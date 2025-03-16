@@ -2,6 +2,7 @@ import mujoco
 import mujoco.viewer
 import pandas as pd
 import numpy as np
+import time
 
 def simulate(xml_path, traj_file, dt=0.002):
     m = mujoco.MjModel.from_xml_path(xml_path)
@@ -19,9 +20,10 @@ def simulate(xml_path, traj_file, dt=0.002):
             d.qacc = qacc
             mujoco.mj_forward(m, d)
             viewer.sync()
+            time.sleep(0.01)
        
     
 if __name__ == "__main__":
     xml_path = "model/scene.xml"
-    traj_file = "data/1.csv"
+    traj_file = "data/g1_traj/1447.csv"
     simulate(xml_path, traj_file)

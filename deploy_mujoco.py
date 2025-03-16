@@ -162,6 +162,8 @@ if __name__ == "__main__":
         header = root_body_q + dofs_q + root_body_dq + dofs_dq + root_body_ddq + dofs_ddq + ["fallover"]
         traj_logger.writerow(header)  
 
+    fallover_steps = 0
+
     # load policy
     policy = torch.jit.load(policy_path)
     
@@ -189,9 +191,12 @@ if __name__ == "__main__":
                     rpy = get_euler_xyz(d.qpos[3:7])
                     if d.qpos[2] < 0.58: # abs(rpy[1]) > 1.0 or abs(abs(rpy[0])-np.pi) > 0.8
                         fallover = 1
+                        fallover_steps += 1
                     else:
                         fallover = 0
                     traj_logger.writerow(np.concatenate((d.qpos, d.qvel, d.qacc, [fallover])))
+                    if fallover_steps == 25:
+                        break
                 
                 # Apply control signal here.
 

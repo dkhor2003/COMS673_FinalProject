@@ -29,25 +29,34 @@ def test_model(model, test_loader):
     print(f"Test Accuracy: {correct / total:.4f}")
 
 if __name__ == "__main__":
+    # X = torch.tensor(np.random.randn(10, 10, 55))  # Shape: (3,2)
+    # y = torch.tensor(np.random.randn(10, 1))  # Shape: (3,)
+
+    # print(X.shape, y.shape)  # Should both have the same first dimension
+
+    # dataset = TensorDataset(X, y)  # Should work correctly
     data_dir = "data/g1_traj"
     X, y = process_csv_into_dataset(data_dir)
     num_data = X.shape[0]
     num_features = X.shape[2]
+    X, y = torch.tensor(X, dtype=torch.float32), torch.tensor(y, dtype=torch.float32)
+    print(X.size())
+    print(y.size())
     dataset = TensorDataset(X, y)
     train_size = int(0.8 * num_data)
     test_size = num_data - train_size
     train_dataset, test_dataset = random_split(dataset, [train_size, test_size])
     
-    train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
-    test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False)
+    train_loader = DataLoader(train_dataset, batch_size=64, shuffle=True)
+    test_loader = DataLoader(test_dataset, batch_size=64, shuffle=False)
     
     # Define model
     model = FalloverPredictor(input_size=num_features)
     
     # Define loss and optimizer
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters(), lr=0.001)
+    optimizer = optim.Adam(model.parameters(), lr=0.01)
 
     # Train and test the model
-    train_model(model, train_loader, criterion, optimizer, epochs=10)
+    train_model(model, train_loader, criterion, optimizer, epochs=20)
     test_model(model, test_loader)

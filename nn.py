@@ -15,12 +15,3 @@ class FalloverPredictor(nn.Module):
         out = self.fc(last_out)
         return self.sigmoid(out).squeeze(-1)
 
-# Example usage
-num_features = 18  # Adjust according to your data
-window_size = 50   # Adjust according to your data
-model = FalloverPredictor(input_size=num_features)
-
-# Dummy input (batch_size, window_size, num_features)
-dummy_input = torch.randn(32, window_size, num_features)
-out = model(dummy_input)
-print(out.shape)  # Should be (32,)

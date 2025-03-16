@@ -30,7 +30,7 @@ def create_dataset(features, targets, window_size=10, time_into_future=0.5, log_
         target = targets[i + window_size + num_timesteps_into_future - 1]
         X.append(feature)
         y.append(target)
-    return torch.tensor(np.array(X)), torch.tensor(np.array(y))
+    return np.array(X), np.array(y) #.reshape((-1, 1))
 
 def process_csv_into_dataset(data_dir):
     """Transform all csv files under data_dir into a single concatenated 2D-ndarray
