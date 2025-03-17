@@ -7,6 +7,7 @@ import random
 import yaml
 import os
 import csv
+from nn import FalloverPredictor
 
 def get_gravity_orientation(quaternion):
     qw = quaternion[0]
@@ -72,7 +73,10 @@ if __name__ == "__main__":
         policy_path = config["policy_path"].replace("{WORKING_DIR}", working_dir)
         policy_path = policy_path.replace("{POLICY}", config["policy"])
         xml_path = config["xml_path"].replace("{WORKING_DIR}", working_dir)
+        lstm_weights_path = config["lstm_weights_path"].replace("{WORKING_DIR}", working_dir)
+        window_size = config["window_size"]
         
+        eval_mode = config["eval_mode"]
         log_on = config["log_on"]
         render = config["render"]
 
@@ -108,6 +112,13 @@ if __name__ == "__main__":
     m = mujoco.MjModel.from_xml_path(xml_path)
     d = mujoco.MjData(m)
     m.opt.timestep = simulation_dt
+    
+    if eval_mode:
+        # Instantiate a new model with the same architecture
+        model = FalloverPredictor(input_size=len(d.qpos) + len(d.qvel) + len(d.qacc))
+        state_dict = torch.load(lstm_weights_path)
+        model.load_state_dict(state_dict)
+        model.eval()
     
     if log_on:
         
@@ -167,6 +178,8 @@ if __name__ == "__main__":
     # load policy
     policy = torch.jit.load(policy_path)
     
+    sliding_window = np.concatenate((d.qpos, d.qvel, d.qacc)).reshape(1, -1)
+    
     with mujoco.viewer.launch_passive(m, d) as viewer:
         
         # Close the viewer automatically after simulation_duration wall-seconds.
@@ -183,6 +196,9 @@ if __name__ == "__main__":
             d.qfrc_applied[1] = y_force
             mujoco.mj_step(m, d)
         
+            if eval_mode and len(sliding_window) == window_size:
+                print(model(torch.tensor(sliding_window.reshape(1, window_size, -1), dtype=torch.float32)))
+        
             counter += 1
             if counter % control_decimation == 0:
                 
@@ -197,6 +213,10 @@ if __name__ == "__main__":
                     traj_logger.writerow(np.concatenate((d.qpos, d.qvel, d.qacc, [fallover])))
                     if fallover_steps == 25:
                         break
+                
+                sliding_window = np.vstack((sliding_window, np.concatenate((d.qpos, d.qvel, d.qacc)).reshape(1, -1)))
+                if len(sliding_window) > window_size:
+                    sliding_window = sliding_window[1:]
                 
                 # Apply control signal here.
 

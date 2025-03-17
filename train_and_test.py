@@ -10,6 +10,7 @@ def train_model(model, train_loader, criterion, optimizer, epochs=10):
         total_loss = 0
         for inputs, labels in train_loader:
             optimizer.zero_grad()
+            print(inputs.size())
             outputs = model(inputs)
             loss = criterion(outputs, labels)
             loss.backward()
