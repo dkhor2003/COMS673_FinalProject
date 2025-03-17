@@ -112,7 +112,7 @@ if __name__ == "__main__":
     if log_on:
         
         if not os.path.exists(data_root_dir):
-            os.mkdir(data_root_dir)
+            os.makedirs(data_root_dir)
             traj_num = 1
         else:
             trajs = os.listdir(data_root_dir)
