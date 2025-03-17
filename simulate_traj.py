@@ -25,5 +25,5 @@ def simulate(xml_path, traj_file, dt=0.002):
     
 if __name__ == "__main__":
     xml_path = "model/scene.xml"
-    traj_file = "data/g1_traj/1447.csv"
+    traj_file = "data/g1_traj/1449.csv"
     simulate(xml_path, traj_file)

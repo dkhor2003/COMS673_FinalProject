@@ -29,16 +29,24 @@ def test_model(model, test_loader):
     print(f"Test Accuracy: {correct / total:.4f}")
 
 if __name__ == "__main__":
-    # X = torch.tensor(np.random.randn(10, 10, 55))  # Shape: (3,2)
-    # y = torch.tensor(np.random.randn(10, 1))  # Shape: (3,)
 
-    # print(X.shape, y.shape)  # Should both have the same first dimension
-
-    # dataset = TensorDataset(X, y)  # Should work correctly
-    data_dir = "data/g1_traj"
-    X, y = process_csv_into_dataset(data_dir)
+    traj_dir = "data/g1_traj"
+    weights_dir = "LSTM_weights"
+    X_file = "data/processed_data/X.npy"
+    y_file = "data/processed_data/y.npy"
+    
+    if os.path.isfile(X_file) and os.path.isfile(y_file): # Used already saved processed X and y
+        print("Loading saved features and targets")
+        X, y = np.load(X_file), np.load(y_file)
+    else:
+        print("Generating features and targets")
+        X, y = process_csv_into_dataset(traj_dir) # Otherwise generate and save them from the trajectories
+        np.save(X_file, X)
+        np.save(y_file, y)
+        
     num_data = X.shape[0]
     num_features = X.shape[2]
+    print(np.count_nonzero(y)) # Check for number data balance. Ideally, number of features with label 0 and 1 should be close and not too far
     X, y = torch.tensor(X, dtype=torch.float32), torch.tensor(y, dtype=torch.float32)
     print(X.size())
     print(y.size())
@@ -47,16 +55,18 @@ if __name__ == "__main__":
     test_size = num_data - train_size
     train_dataset, test_dataset = random_split(dataset, [train_size, test_size])
     
-    train_loader = DataLoader(train_dataset, batch_size=64, shuffle=True)
-    test_loader = DataLoader(test_dataset, batch_size=64, shuffle=False)
+    train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
+    test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False)
     
     # Define model
     model = FalloverPredictor(input_size=num_features)
     
     # Define loss and optimizer
-    criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters(), lr=0.01)
+    criterion = nn.BCELoss()
+    optimizer = optim.Adam(model.parameters(), lr=0.005)
 
     # Train and test the model
-    train_model(model, train_loader, criterion, optimizer, epochs=20)
+    train_model(model, train_loader, criterion, optimizer, epochs=10)
     test_model(model, test_loader)
+    
+    torch.save(model.state_dict(), f"{weights_dir}/experiment1_weights.pth")
