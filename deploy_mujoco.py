@@ -62,12 +62,6 @@ if __name__ == "__main__":
     yaw_range = [-1., 1.]
     force_ranges = [-50, -30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 30, 50]
     
-    x_force = random.choice(force_ranges)
-    y_force = random.choice(force_ranges)
-    vx = random.uniform(vx_range[0], vx_range[1])
-    vy = random.uniform(vy_range[0], vy_range[1])
-    yaw = random.uniform(yaw_range[0], yaw_range[1])
-    
     with open(config_file, "r") as f:
         config = yaml.load(f, Loader=yaml.FullLoader)
         policy_path = config["policy_path"].replace("{WORKING_DIR}", working_dir)
@@ -75,6 +69,8 @@ if __name__ == "__main__":
         xml_path = config["xml_path"].replace("{WORKING_DIR}", working_dir)
         lstm_weights_path = config["lstm_weights_path"].replace("{WORKING_DIR}", working_dir)
         window_size = config["window_size"]
+
+        random_seed = config["random_seed"]
         
         eval_mode = config["eval_mode"]
         log_on = config["log_on"]
@@ -97,9 +93,21 @@ if __name__ == "__main__":
 
         num_actions = config["num_actions"]
         num_obs = config["num_obs"]
-        
-        cmd = np.array(config["cmd_init"], dtype=np.float32)
-        cmd = np.array([vx, vy, yaw])
+
+    if random_seed > 0:
+        random.seed(random_seed)
+    else:
+        ctime = time.time_ns()
+        print('Setting random seed to current time',ctime)
+        random.seed(ctime)
+
+    x_force = random.choice(force_ranges)
+    y_force = random.choice(force_ranges)
+    vx = random.uniform(vx_range[0], vx_range[1])
+    vy = random.uniform(vy_range[0], vy_range[1])
+    yaw = random.uniform(yaw_range[0], yaw_range[1])
+
+    cmd = np.array([vx, vy, yaw])
 
     # define context variables
     action = np.zeros(num_actions, dtype=np.float32)
