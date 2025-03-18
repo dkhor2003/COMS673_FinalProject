@@ -14,19 +14,73 @@ out_png=args.out_png
 
 df=pd.read_csv(in_csv)
 
+joint_names = []
+dofs_q = []
+dofs_dq = []
+dofs_ddq = []
+
+joint_names=['floating_base_joint', 
+             'left_hip_pitch_joint', 'left_hip_roll_joint', 'left_hip_yaw_joint', 
+             'left_knee_joint', 
+             'left_ankle_pitch_joint', 'left_ankle_roll_joint', 
+             'right_hip_pitch_joint', 'right_hip_roll_joint', 'right_hip_yaw_joint', 
+             'right_knee_joint', 
+             'right_ankle_pitch_joint', 'right_ankle_roll_joint'
+             ]
+
+root_body = joint_names[0]
+dofs = joint_names[1:]
+
+root_body_q = [f"{root_body}_x",
+                f"{root_body}_y",
+                f"{root_body}_z",
+                f"{root_body}_qw",
+                f"{root_body}_qx",
+                f"{root_body}_qy",
+                f"{root_body}_qz"]
+
+root_body_dq = [f"{root_body}_vx",
+                f"{root_body}_vy",
+                f"{root_body}_vz",
+                f"{root_body}_wx",
+                f"{root_body}_wy",
+                f"{root_body}_wz"]
+
+root_body_ddq = [f"{root_body}_acc_x",
+                    f"{root_body}_acc_y",
+                    f"{root_body}_acc_z",
+                    f"{root_body}_alpha_x",
+                    f"{root_body}_alpha_y",
+                    f"{root_body}_alpha_z"]
+
+for dof in dofs:
+    dofs_q.append(f"{dof}_q")
+    dofs_dq.append(f"{dof}_dq")
+    dofs_ddq.append(f"{dof}_ddq")
+
 fallover=df['fallover']
 df.drop(columns=['fallover'],inplace=True)
 fall_start=fallover[fallover.diff()==1].index
 
-df=(df-df.mean())/df.std()
+df_norm=(df-df.mean())/df.std()
 
-fig, ax = plt.subplots()
+fig, axs = plt.subplots(2,2,sharex=True,constrained_layout=True)
+axs=axs.ravel()
 
-df.plot(ax=ax,legend=False)
+df_norm[dofs_q].plot(ax=axs[0],legend=False)
+df_norm[dofs_dq].plot(ax=axs[1],legend=False)
+df_norm[dofs_ddq].plot(ax=axs[2],legend=False)
+
 if len(fall_start)>0:
-    ax.axvspan(fall_start[0],len(df), color='red', alpha=0.5)
+    axs[0].axvspan(fall_start[0],len(df), color='red', alpha=0.5)
+    axs[1].axvspan(fall_start[0],len(df), color='red', alpha=0.5)
+    axs[2].axvspan(fall_start[0],len(df), color='red', alpha=0.5)
 
-plt.xlabel('step')
-plt.ylabel('normalized attributes')
+axs[0].set_xlabel('step')
+axs[0].set_ylabel('q (norm.)')
+axs[1].set_xlabel('step')
+axs[1].set_ylabel('dq (norm.)')
+axs[2].set_xlabel('step')
+axs[2].set_ylabel('ddq (norm.)')
 
-plt.savefig(out_png)
+plt.savefig(out_png,dpi=300)
