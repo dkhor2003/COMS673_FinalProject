@@ -32,12 +32,24 @@ conda install pytorch=2.3.1
 conda install pyyaml
 ```
 
+If conda doesn't work, install using pip:
+```bash
+pip install mujoco
+pip install torch
+```
+
 ## Simulation in MuJoCo
 
 Simulate G1 in the MuJoCo simulator:
 
 ```bash
 python deploy_mujoco.py g1.yaml
+```
+
+If you are on mac, use:
+
+```bash
+mjpython deploy_mujoco.py g1.yaml
 ```
 
 #### ➡️ Important YAML Configuration Variables
@@ -47,4 +59,3 @@ The available policies are located under the `policy` directory.
 - Update the `cmd_init` [vx, vy, yaw] in the YAML configuration file to change the desired starting motion. 
 
 If `log_on` is `true`, running the above line will generate joint state trajectories as a csv file under the `data` folder.
-
