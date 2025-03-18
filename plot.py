@@ -58,6 +58,10 @@ for dof in dofs:
     dofs_dq.append(f"{dof}_dq")
     dofs_ddq.append(f"{dof}_ddq")
 
+dofs_q+=root_body_q
+dofs_dq+=root_body_dq
+dofs_ddq+=root_body_ddq
+
 fallover=df['fallover']
 df.drop(columns=['fallover'],inplace=True)
 fall_start=fallover[fallover.diff()==1].index
@@ -70,11 +74,13 @@ axs=axs.ravel()
 df_norm[dofs_q].plot(ax=axs[0],legend=False)
 df_norm[dofs_dq].plot(ax=axs[1],legend=False)
 df_norm[dofs_ddq].plot(ax=axs[2],legend=False)
+df[root_body_q].plot(ax=axs[3],legend=False)
 
 if len(fall_start)>0:
     axs[0].axvspan(fall_start[0],len(df), color='red', alpha=0.5)
     axs[1].axvspan(fall_start[0],len(df), color='red', alpha=0.5)
     axs[2].axvspan(fall_start[0],len(df), color='red', alpha=0.5)
+    axs[3].axvspan(fall_start[0],len(df), color='red', alpha=0.5)
 
 axs[0].set_xlabel('step')
 axs[0].set_ylabel('q (norm.)')
@@ -82,5 +88,7 @@ axs[1].set_xlabel('step')
 axs[1].set_ylabel('dq (norm.)')
 axs[2].set_xlabel('step')
 axs[2].set_ylabel('ddq (norm.)')
+axs[3].set_xlabel('step')
+axs[3].set_ylabel('root q')
 
 plt.savefig(out_png,dpi=300)
