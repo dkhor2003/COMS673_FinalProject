@@ -4,6 +4,7 @@ xml_path: "{WORKING_DIR}/model/scene.xml"
 lstm_weights_path: "{WORKING_DIR}/LSTM_weights/experiment1_weights.pth"
 eval_mode: true # boolean for incorporating trained fallover predictor or not
 window_size: 10
+random_seed: -1 # random seed; more than zero for reproducibility
 log_on: false # boolean for allowing trajectory collecting or not
 render: true # boolean for allowing visualization or not
 # Total simulation time
@@ -22,4 +23,3 @@ action_scale: 0.25
 cmd_scale: [2.0, 2.0, 0.25]
 num_actions: 12
 num_obs: 47
-cmd_init: [0.01, 0, 0]
