@@ -10,7 +10,6 @@ def train_model(model, train_loader, criterion, optimizer, epochs=10):
         total_loss = 0
         for inputs, labels in train_loader:
             optimizer.zero_grad()
-            print(inputs.size())
             outputs = model(inputs)
             loss = criterion(outputs, labels)
             loss.backward()
@@ -33,6 +32,8 @@ if __name__ == "__main__":
 
     traj_dir = "data/g1_traj"
     weights_dir = "LSTM_weights"
+    if not os.path.exists("data/processed_data"):
+        os.makedirs("data/processed_data")
     X_file = "data/processed_data/X.npy"
     y_file = "data/processed_data/y.npy"
     
