@@ -11,6 +11,7 @@ from sklearn.metrics import confusion_matrix, roc_auc_score, roc_curve
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--model', choices=['logistic','linear','perceptron'], required=True, help='Choose the model')
+parser.add_argument('--t_horizon', type=float, default=0.5, help='Timestep horizon for the model (seconds)')
 parser.add_argument('--test_only', action='store_true', help='Only perform testing using trained models')
 args = parser.parse_args()
 
@@ -24,6 +25,7 @@ df_list = []
 for fn in all_files:
     df = pd.read_csv(fn)
     df["time"] = np.arange(len(df)) * 0.02
+    df['fallover'] = df['fallover'].shift(int(-args.t_horizon/0.02),fill_value=0)
     df_list.append(df)
 
 data = pd.concat(df_list, ignore_index=True)
