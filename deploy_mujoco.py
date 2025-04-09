@@ -55,15 +55,25 @@ if __name__ == "__main__":
     args = parser.parse_args()
     config_file = args.config_file
     working_dir = os.path.dirname(os.path.abspath(__file__))
-    data_root_dir = "data/g1_traj"
+    data_root_dir = "data/g1_traj_new"
     
     vx_range = [-1.2, 1.2]
     vy_range = [-1.2, 1.2]
     yaw_range = [-1., 1.]
-    force_ranges = [-50, -30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 30, 50]
+    force_ranges = [-40, -20, 0, 20, 40]
+    joint_force_ranges = [-40, -20, 0, 20, 40]
+    apply_force = random.choice([True, False])
+    if apply_force:
+        x_force = random.choice(force_ranges)
+        y_force = random.choice(force_ranges)
+        left_ankle_forces = random.choice(joint_force_ranges)
+        right_ankle_forces = random.choice(joint_force_ranges)
+    else:
+        x_force = 0
+        y_force = 0
+        left_ankle_forces = 0
+        right_ankle_forces = 0
     
-    x_force = random.choice(force_ranges)
-    y_force = random.choice(force_ranges)
     vx = random.uniform(vx_range[0], vx_range[1])
     vy = random.uniform(vy_range[0], vy_range[1])
     yaw = random.uniform(yaw_range[0], yaw_range[1])
@@ -194,6 +204,10 @@ if __name__ == "__main__":
             # a policy and applies a control signal before stepping the physics.
             d.qfrc_applied[0] = x_force
             d.qfrc_applied[1] = y_force
+            d.qfrc_applied[10] = left_ankle_forces
+            d.qfrc_applied[11] = left_ankle_forces
+            d.qfrc_applied[16] = right_ankle_forces
+            d.qfrc_applied[17] = right_ankle_forces
             mujoco.mj_step(m, d)
         
             if eval_mode and len(sliding_window) == window_size:
@@ -252,6 +266,7 @@ if __name__ == "__main__":
 
             # Pick up changes to the physics state, apply perturbations, update options from GUI.
             viewer.sync()
+            time.sleep(0.001)
 
             # Rudimentary time keeping, will drift relative to wall clock.
             time_until_next_step = m.opt.timestep - (time.time() - step_start)
