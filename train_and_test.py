@@ -31,10 +31,10 @@ def test_model(model, test_loader):
 
 if __name__ == "__main__":
 
-    traj_dir = "data/g1_traj"
+    traj_dir = "data/g1_traj_new"
     weights_dir = "LSTM_weights"
-    X_file = "data/processed_data/X.npy"
-    y_file = "data/processed_data/y.npy"
+    X_file = "data/processed_data/X2.npy"
+    y_file = "data/processed_data/y2.npy"
     
     if os.path.isfile(X_file) and os.path.isfile(y_file): # Used already saved processed X and y
         print("Loading saved features and targets")
@@ -70,4 +70,4 @@ if __name__ == "__main__":
     train_model(model, train_loader, criterion, optimizer, epochs=10)
     test_model(model, test_loader)
     
-    torch.save(model.state_dict(), f"{weights_dir}/experiment1_weights.pth")
+    torch.save(model.state_dict(), f"{weights_dir}/experiment2_weights.pth")

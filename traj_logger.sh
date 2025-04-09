@@ -18,6 +18,7 @@ POLICY_ITER=("policy_lstm_1_500.pt"
 
 yq -i ".log_on = true" g1.yaml
 yq -i ".render = true" g1.yaml
+yq -i ".eval_mode = false" g1.yaml
 
 # Loop to run the command
 for policy in "${POLICY_ITER[@]}"; do
