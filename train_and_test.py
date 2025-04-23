@@ -49,8 +49,6 @@ if __name__ == "__main__":
     num_features = X.shape[2]
     print(np.count_nonzero(y)) # Check for number data balance. Ideally, number of features with label 0 and 1 should be close and not too far
     X, y = torch.tensor(X, dtype=torch.float32), torch.tensor(y, dtype=torch.float32)
-    print(X.size())
-    print(y.size())
     dataset = TensorDataset(X, y)
     train_size = int(0.8 * num_data)
     test_size = num_data - train_size

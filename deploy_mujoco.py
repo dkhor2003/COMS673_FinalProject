@@ -55,13 +55,13 @@ if __name__ == "__main__":
     args = parser.parse_args()
     config_file = args.config_file
     working_dir = os.path.dirname(os.path.abspath(__file__))
-    data_root_dir = "data/g1_traj_new"
+    data_root_dir = "data/g1_traj_3"
     
     vx_range = [-1.2, 1.2]
     vy_range = [-1.2, 1.2]
     yaw_range = [-1., 1.]
-    force_ranges = [-40, -20, 0, 20, 40]
-    joint_force_ranges = [-40, -20, 0, 20, 40]
+    force_ranges = [-100, -50, 0, 50, 100]
+    joint_force_ranges = [-30, -15, 0, 15, 30]
     apply_force = random.choice([True, False])
     if apply_force:
         x_force = random.choice(force_ranges)

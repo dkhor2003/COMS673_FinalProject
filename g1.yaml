@@ -1,8 +1,8 @@
-policy: "policy_lstm_1_20000.pt"
+policy: "policy_lstm_1_7000.pt"
 policy_path: "{WORKING_DIR}/policy/{POLICY}"
 xml_path: "{WORKING_DIR}/model/scene.xml"
 lstm_weights_path: "{WORKING_DIR}/LSTM_weights/experiment2_weights.pth"
-eval_mode: true # boolean for incorporating trained fallover predictor or not
+eval_mode: false # boolean for incorporating trained fallover predictor or not
 window_size: 10
 log_on: false # boolean for allowing trajectory collecting or not
 render: true # boolean for allowing visualization or not
