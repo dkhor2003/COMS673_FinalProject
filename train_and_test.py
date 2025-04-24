@@ -10,7 +10,6 @@ def train_model(model, train_loader, criterion, optimizer, epochs=10):
         total_loss = 0
         for inputs, labels in train_loader:
             optimizer.zero_grad()
-            print(inputs.size())
             outputs = model(inputs)
             loss = criterion(outputs, labels)
             loss.backward()
@@ -31,10 +30,10 @@ def test_model(model, test_loader):
 
 if __name__ == "__main__":
 
-    traj_dir = "data/g1_traj_new"
+    traj_dir = "data/g1_traj_3"
     weights_dir = "LSTM_weights"
-    X_file = "data/processed_data/X2.npy"
-    y_file = "data/processed_data/y2.npy"
+    X_file = "data/processed_data/X3.npy"
+    y_file = "data/processed_data/y3.npy"
     
     if os.path.isfile(X_file) and os.path.isfile(y_file): # Used already saved processed X and y
         print("Loading saved features and targets")
@@ -45,9 +44,25 @@ if __name__ == "__main__":
         np.save(X_file, X)
         np.save(y_file, y)
         
+    print("Before upsampling, number of 0 class: ", np.count_nonzero(y), " out of a total of ", len(y), " samples") 
+    
+    # Upsampling
+    idx_class_0 = np.where(y == 0)[0]
+    idx_class_1 = np.where(y == 1)[0]
+    num_to_add = len(idx_class_0) - len(idx_class_1)
+    idx_upsampled = np.random.choice(idx_class_1, size=num_to_add, replace=True)
+    new_X_sample = X[idx_upsampled]
+    new_y_sample = y[idx_upsampled]
+    noise = np.random.uniform(low=-0.01, high=0.01, size=new_X_sample.shape)
+    new_X_sample += noise
+    X = np.concatenate([X, new_X_sample], axis=0)
+    y = np.concatenate([y, new_y_sample], axis=0)
+    
+    print("After upsampling, number of 0 class: ", np.count_nonzero(y), " out of a total of ", len(y), " samples") 
+    
     num_data = X.shape[0]
     num_features = X.shape[2]
-    print(np.count_nonzero(y)) # Check for number data balance. Ideally, number of features with label 0 and 1 should be close and not too far
+    
     X, y = torch.tensor(X, dtype=torch.float32), torch.tensor(y, dtype=torch.float32)
     dataset = TensorDataset(X, y)
     train_size = int(0.8 * num_data)
@@ -68,4 +83,4 @@ if __name__ == "__main__":
     train_model(model, train_loader, criterion, optimizer, epochs=10)
     test_model(model, test_loader)
     
-    torch.save(model.state_dict(), f"{weights_dir}/experiment2_weights.pth")
+    torch.save(model.state_dict(), f"{weights_dir}/experiment3_weights.pth")

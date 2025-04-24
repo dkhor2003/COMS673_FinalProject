@@ -41,18 +41,21 @@ def process_csv_into_dataset(data_dir):
     Xs = None
     ys = None
     for csv_file in os.listdir(data_dir):
-        traj = pd.read_csv(f"{data_dir}/{csv_file}").to_numpy()
-        features = traj[:, :-1]
-        targets = traj[:, -1]
-        X, y = create_dataset(features=features, targets=targets)
-        if Xs is not None:
-            Xs = np.vstack((Xs, X))
-        else:
-            Xs = X
-        if ys is not None:
-            ys = np.hstack((ys, y))
-        else:
-            ys = y
+        try:
+            traj = pd.read_csv(f"{data_dir}/{csv_file}").to_numpy()
+            features = traj[:, :-1]
+            targets = traj[:, -1]
+            X, y = create_dataset(features=features, targets=targets)
+            if Xs is not None:
+                Xs = np.vstack((Xs, X))
+            else:
+                Xs = X
+            if ys is not None:
+                ys = np.hstack((ys, y))
+            else:
+                ys = y
+        except:
+            continue
 
     # Xs shape: (total_num_of_data, window_size, num_features)
     # ys shape: (total_num_of_data, )
