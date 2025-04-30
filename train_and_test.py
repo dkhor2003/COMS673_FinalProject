@@ -29,9 +29,9 @@ def test_model(model, test_loader):
     print(f"Test Accuracy: {correct / total:.4f}")
 
 if __name__ == "__main__":
-
+    
     traj_dir = "data/g1_traj_3"
-    weights_dir = "LSTM_weights"
+    weights_dir = "nn_weights/lstm"
     X_file = "data/processed_data/X3.npy"
     y_file = "data/processed_data/y3.npy"
     
