@@ -77,7 +77,7 @@ if __name__ == "__main__":
     
     # Define loss and optimizer
     criterion = nn.BCELoss()
-    optimizer = optim.Adam(model.parameters(), lr=0.005)
+    optimizer = optim.Adam(model.parameters(), lr=0.001)
 
     # Train and test the model
     train_model(model, train_loader, criterion, optimizer, epochs=10)
