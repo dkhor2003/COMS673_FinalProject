@@ -22,6 +22,13 @@ model_path=args.model_path
 
 df=pd.read_csv(in_csv)
 
+# copied from preprocessing.py
+window_size=10
+time_into_future=0.5
+log_dt=0.02
+
+times=np.arange(0, len(df)*log_dt, log_dt)
+
 if args.model_path:
     # Define model
     model = FalloverPredictor(input_size=len(df.columns)-1)
@@ -42,10 +49,6 @@ if args.model_path:
         outputs = model(inputs)
         model_out=np.concatenate([model_out,outputs.detach().numpy()],axis=0)
 
-    # copied from preprocessing.py
-    window_size=10
-    time_into_future=0.5
-    log_dt=0.02
     num_timesteps_into_future = int(time_into_future / log_dt)
     model_out=np.concatenate([np.zeros((window_size-1)),model_out],axis=0)
 
@@ -111,26 +114,30 @@ if args.model_path:
         # ax_twin.set_ylabel('model output')
         ax_twin.set_yticks([])
         ax_twin.set_ylim(0,1)
-        ax_twin.plot(model_out, ls='--', color='blue', alpha=0.5)
+        ax_twin.plot(times[:-num_timesteps_into_future],model_out, ls='--', color='blue', alpha=0.5)
 
-df_norm[dofs_q].plot(ax=axs[0],legend=False)
-df_norm[dofs_dq].plot(ax=axs[1],legend=False)
-df_norm[dofs_ddq].plot(ax=axs[2],legend=False)
-df[root_body_q].plot(ax=axs[3],legend=False)
+for col in dofs_q:
+    axs[0].plot(times, df_norm[col])
+for col in dofs_dq:
+    axs[1].plot(times, df_norm[col])
+for col in dofs_ddq:
+    axs[2].plot(times, df_norm[col])
+for col in root_body_q:
+    axs[3].plot(times, df[col])
 
 if len(fall_start)>0:
-    axs[0].axvspan(fall_start[0],len(df), color='red', alpha=0.5)
-    axs[1].axvspan(fall_start[0],len(df), color='red', alpha=0.5)
-    axs[2].axvspan(fall_start[0],len(df), color='red', alpha=0.5)
-    axs[3].axvspan(fall_start[0],len(df), color='red', alpha=0.5)
+    axs[0].axvspan(fall_start[0]*log_dt,len(df)*log_dt, color='red', alpha=0.5)
+    axs[1].axvspan(fall_start[0]*log_dt,len(df)*log_dt, color='red', alpha=0.5)
+    axs[2].axvspan(fall_start[0]*log_dt,len(df)*log_dt, color='red', alpha=0.5)
+    axs[3].axvspan(fall_start[0]*log_dt,len(df)*log_dt, color='red', alpha=0.5)
 
-axs[0].set_xlabel('step')
+# axs[0].set_xlabel('time (s)')
 axs[0].set_ylabel('q (norm.)')
-axs[1].set_xlabel('step')
+# axs[1].set_xlabel('time (s)')
 axs[1].set_ylabel('dq (norm.)')
-axs[2].set_xlabel('step')
+axs[2].set_xlabel('time (s)')
 axs[2].set_ylabel('ddq (norm.)')
-axs[3].set_xlabel('step')
+axs[3].set_xlabel('time (s)')
 axs[3].set_ylabel('root q')
 
 plt.savefig(out_png,dpi=300)
