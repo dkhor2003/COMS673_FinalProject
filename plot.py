@@ -4,15 +4,50 @@ import matplotlib.pyplot as plt
 from argparse import ArgumentParser
 import os
 
+import torch
+from torch.utils.data import DataLoader, TensorDataset
+from preprocessing import create_dataset
+
+from nn import FalloverPredictor
+
 parser=ArgumentParser()
 parser.add_argument('-i','--in_csv', required=True)
 parser.add_argument('-o','--out_png', required=True)
+parser.add_argument('-m','--model_path', required=False, default=None)
 
 args=parser.parse_args()
 in_csv=args.in_csv
 out_png=args.out_png
+model_path=args.model_path
 
 df=pd.read_csv(in_csv)
+
+if args.model_path:
+    # Define model
+    model = FalloverPredictor(input_size=len(df.columns)-1)
+    # Load the model
+    model.load_state_dict(torch.load(model_path,weights_only=True))
+    # Set the model to evaluation mode
+    model.eval()
+
+    traj = df.to_numpy()
+    features = traj[:, :-1]
+    targets = traj[:, -1]
+    X, y = create_dataset(features=features, targets=targets)
+    X, y = torch.tensor(X, dtype=torch.float32), torch.tensor(y, dtype=torch.float32)
+    dataset = TensorDataset(X, y)
+    loader = DataLoader(dataset, batch_size=32, shuffle=False)
+    model_out=[]
+    for inputs, labels in loader:
+        outputs = model(inputs)
+        model_out=np.concatenate([model_out,outputs.detach().numpy()],axis=0)
+
+    # copied from preprocessing.py
+    window_size=10
+    time_into_future=0.5
+    log_dt=0.02
+    num_timesteps_into_future = int(time_into_future / log_dt)
+    model_out=np.concatenate([np.zeros((window_size-1)),model_out],axis=0)
 
 joint_names = []
 dofs_q = []
@@ -70,6 +105,13 @@ df_norm=(df-df.mean())/df.std()
 
 fig, axs = plt.subplots(2,2,sharex=True,constrained_layout=True)
 axs=axs.ravel()
+if args.model_path:
+    for ax in axs:
+        ax_twin = ax.twinx()
+        # ax_twin.set_ylabel('model output')
+        ax_twin.set_yticks([])
+        ax_twin.set_ylim(0,1)
+        ax_twin.plot(model_out, ls='--', color='blue', alpha=0.5)
 
 df_norm[dofs_q].plot(ax=axs[0],legend=False)
 df_norm[dofs_dq].plot(ax=axs[1],legend=False)
