@@ -1,0 +1,14 @@
+Loading saved features and targets
+Before upsampling, number of 0 class:  18231  out of a total of  181604  samples
+After upsampling, number of 0 class:  163373  out of a total of  326746  samples
+Epoch 1, Loss: 0.3241
+Epoch 2, Loss: 0.2759
+Epoch 3, Loss: 0.2661
+Epoch 4, Loss: 0.2606
+Epoch 5, Loss: 0.2562
+Epoch 6, Loss: 0.2580
+Epoch 7, Loss: 0.2589
+Epoch 8, Loss: 0.2540
+Epoch 9, Loss: 0.2514
+Epoch 10, Loss: 0.2502
+Test Accuracy: 0.9124
