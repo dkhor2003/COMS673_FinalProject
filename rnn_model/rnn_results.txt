@@ -1,0 +1,27 @@
+==================================================
+[CONFIG] RNN Type     : rnn
+[CONFIG] Epochs       : 10
+[CONFIG] Batch Size   : 32
+[CONFIG] Seq Length   : 20
+[CONFIG] Learning Rate: 0.001
+==================================================
+[WARN] Dropped extra column 'right_ankle_roll_joint_ddq' from 1600 files
+[DONE] Total sequences loaded: 334553
+[INFO] Using RNN type: RNN
+Epoch 1: Loss=0.0467, Accuracy=98.35%
+Epoch 2: Loss=0.0293, Accuracy=98.91%
+Epoch 3: Loss=0.0258, Accuracy=99.03%
+Epoch 4: Loss=0.0236, Accuracy=99.13%
+Epoch 5: Loss=0.0236, Accuracy=99.11%
+Epoch 6: Loss=0.0229, Accuracy=99.16%
+Epoch 7: Loss=0.0218, Accuracy=99.19%
+Epoch 8: Loss=0.0214, Accuracy=99.21%
+Epoch 9: Loss=0.0216, Accuracy=99.19%
+Epoch 10: Loss=0.0211, Accuracy=99.20%
+
+==================================================
+🏁 Training Complete
+🧠 RNN Type             : RNN
+📉 Final Epoch Loss     : 0.0211
+✅ Final Epoch Accuracy : 99.20%
+==================================================
