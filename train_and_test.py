@@ -1,5 +1,5 @@
 from preprocessing import *
-from nn import FalloverPredictor
+from nn import RNN, LSTM, BiLSTM
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader, TensorDataset, random_split
@@ -31,7 +31,7 @@ def test_model(model, test_loader):
 if __name__ == "__main__":
     
     traj_dir = "data/g1_traj_3"
-    weights_dir = "nn_weights/lstm"
+    weights_dir = "nn_weights"
     X_file = "data/processed_data/X3.npy"
     y_file = "data/processed_data/y3.npy"
     
@@ -72,8 +72,10 @@ if __name__ == "__main__":
     train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
     test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False)
     
+    #### TRAIN LSTM MODEL ####
+    
     # Define model
-    model = FalloverPredictor(input_size=num_features)
+    model = LSTM(input_size=num_features)
     
     # Define loss and optimizer
     criterion = nn.BCELoss()
@@ -83,4 +85,34 @@ if __name__ == "__main__":
     train_model(model, train_loader, criterion, optimizer, epochs=10)
     test_model(model, test_loader)
     
-    torch.save(model.state_dict(), f"{weights_dir}/experiment3_weights.pth")
+    torch.save(model.state_dict(), f"{weights_dir}/lstm/experiment3_weights.pth")
+    
+    #### TRAIN RNN MODEL ####
+    
+    # Define model
+    model = RNN(input_size=num_features)
+    
+    # Define loss and optimizer
+    criterion = nn.BCELoss()
+    optimizer = optim.Adam(model.parameters(), lr=0.001)
+
+    # Train and test the model
+    train_model(model, train_loader, criterion, optimizer, epochs=10)
+    test_model(model, test_loader)
+    
+    torch.save(model.state_dict(), f"{weights_dir}/rnn/experiment1_weights.pth")
+    
+    #### TRAIN BiLSTM MODEL ####
+    
+    # Define model
+    model = BiLSTM(input_size=num_features)
+    
+    # Define loss and optimizer
+    criterion = nn.BCELoss()
+    optimizer = optim.Adam(model.parameters(), lr=0.001)
+
+    # Train and test the model
+    train_model(model, train_loader, criterion, optimizer, epochs=10)
+    test_model(model, test_loader)
+    
+    torch.save(model.state_dict(), f"{weights_dir}/bilstm/experiment1_weights.pth")

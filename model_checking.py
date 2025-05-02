@@ -40,9 +40,4 @@ end_time = time.time()
 inference_time = end_time - start_time
 
 print(f"Number of parameters: {num_param}")
-print(f"Average inference time with {processing_unit} synchronization: {inference_time:.4f} seconds")
-
-# with profiler.profile(record_shapes=True) as prof:
-#     with profiler.record_function("model_inference"):
-#         output = model(input_data)
-# print(prof.key_averages().table(sort_by="cpu_time_total", row_limit=10))
+print(f"Average inference time with {processing_unit} synchronization: {inference_time:.4f} seconds") 
