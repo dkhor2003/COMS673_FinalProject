@@ -59,6 +59,7 @@ if __name__ == "__main__":
     y = np.concatenate([y, new_y_sample], axis=0)
     
     print("After upsampling, number of 0 class: ", np.count_nonzero(y), " out of a total of ", len(y), " samples") 
+    print("------------------------------------------------------------")
     
     num_data = X.shape[0]
     num_features = X.shape[2]
@@ -75,6 +76,7 @@ if __name__ == "__main__":
     #### TRAIN LSTM MODEL ####
     
     # Define model
+    print("[START] LSTM")
     model = LSTM(input_size=num_features)
     
     # Define loss and optimizer
@@ -86,10 +88,13 @@ if __name__ == "__main__":
     test_model(model, test_loader)
     
     torch.save(model.state_dict(), f"{weights_dir}/lstm/experiment3_weights.pth")
+    print("[END] LSTM")
+    print("------------------------------------------------------------")
     
     #### TRAIN RNN MODEL ####
     
     # Define model
+    print("[START] RNN")
     model = RNN(input_size=num_features)
     
     # Define loss and optimizer
@@ -101,10 +106,12 @@ if __name__ == "__main__":
     test_model(model, test_loader)
     
     torch.save(model.state_dict(), f"{weights_dir}/rnn/experiment1_weights.pth")
-    
+    print("[END] RNN")
+    print("------------------------------------------------------------")
     #### TRAIN BiLSTM MODEL ####
     
     # Define model
+    print("[START] BiLSTM")
     model = BiLSTM(input_size=num_features)
     
     # Define loss and optimizer
@@ -116,3 +123,5 @@ if __name__ == "__main__":
     test_model(model, test_loader)
     
     torch.save(model.state_dict(), f"{weights_dir}/bilstm/experiment1_weights.pth")
+    print("[END] BiLSTM")
+    print("------------------------------------------------------------")
