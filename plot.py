@@ -8,17 +8,21 @@ import torch
 from torch.utils.data import DataLoader, TensorDataset
 from preprocessing import create_dataset
 
-from nn import FalloverPredictor
+from torchviz import make_dot
+
+from nn import LSTM
 
 parser=ArgumentParser()
 parser.add_argument('-i','--in_csv', required=True)
 parser.add_argument('-o','--out_png', required=True)
 parser.add_argument('-m','--model_path', required=False, default=None)
+parser.add_argument('--draw_graph', action='store_true', default=False)
 
 args=parser.parse_args()
 in_csv=args.in_csv
 out_png=args.out_png
 model_path=args.model_path
+draw_graph=args.draw_graph
 
 df=pd.read_csv(in_csv)
 
@@ -31,7 +35,7 @@ times=np.arange(0, len(df)*log_dt, log_dt)
 
 if args.model_path:
     # Define model
-    model = FalloverPredictor(input_size=len(df.columns)-1)
+    model = LSTM(input_size=len(df.columns)-1)
     # Load the model
     model.load_state_dict(torch.load(model_path,weights_only=True))
     # Set the model to evaluation mode
@@ -48,6 +52,9 @@ if args.model_path:
     for inputs, labels in loader:
         outputs = model(inputs)
         model_out=np.concatenate([model_out,outputs.detach().numpy()],axis=0)
+
+    if draw_graph:
+        make_dot(outputs.mean(), params=dict(model.named_parameters())).render()
 
     num_timesteps_into_future = int(time_into_future / log_dt)
     model_out=np.concatenate([np.zeros((window_size-1)),model_out],axis=0)
