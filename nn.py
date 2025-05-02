@@ -31,7 +31,7 @@ class BiLSTM(nn.Module):
     def __init__(self, input_size, hidden_size=64, num_layers=2, dropout=0.2):
         super(BiLSTM, self).__init__()
         self.lstm = nn.LSTM(input_size, hidden_size, num_layers, batch_first=True, dropout=dropout, bidirectional=True)
-        self.fc = nn.Linear(hidden_size, 1)
+        self.fc = nn.Linear(hidden_size*2, 1) # times 2 because of bidirectional
         self.sigmoid = nn.Sigmoid()
 
     def forward(self, x):

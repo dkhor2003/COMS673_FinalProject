@@ -1,11 +1,11 @@
-from nn import FalloverPredictor
+from nn import LSTM, RNN, BiLSTM
 import torch
 from torch.autograd import profiler
 import numpy as np
 import yaml
 import time
 
-lstm_weights_path = "LSTM_weights/experiment1_weights.pth"
+lstm_weights_path = "nn_weights/bilstm/experiment1_weights.pth"
 config_file = "g1.yaml"
 num_features = 55
 
@@ -13,7 +13,7 @@ with open(config_file, "r") as f:
     config = yaml.load(f, Loader=yaml.FullLoader)
     window_size = config["window_size"]
 
-model = FalloverPredictor(input_size=num_features)
+model = BiLSTM(input_size=num_features)
 state_dict = torch.load(lstm_weights_path)
 model.load_state_dict(state_dict)
 
